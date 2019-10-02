@@ -1,0 +1,44 @@
+enable 
+conf t
+
+hostname SJ-SW-2
+!
+vrf definition MGMT
+ !
+ address-family ipv4
+ exit-address-family
+
+ip name-server vrf MGMT 8.8.8.8
+
+ip domain name marbellengineering.com
+!
+spanning-tree extend system-id
+!         
+username admin privilege 15 password 0 admin
+
+!
+interface GigabitEthernet0/0
+ no switchport
+ vrf forwarding MGMT
+ ip address 172.29.130.106 255.255.255.0
+ no shut
+!
+virtual-service csr_mgmt
+!
+ip forward-protocol nd
+!
+no ip http server
+no ip http secure-server
+ip route vrf MGMT 0.0.0.0 0.0.0.0 172.29.130.1
+ip ssh version 2
+!
+line con 0
+ logging synchronous
+ stopbits 1
+line vty 0 4
+ privilege level 15
+ login local
+ transport input all
+
+crypto key generate rsa mod 2048
+end
